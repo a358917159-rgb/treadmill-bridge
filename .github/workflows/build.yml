@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
   build:
-  # 使用官方 Linux 环境自动运行 Buildozer 打包
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
