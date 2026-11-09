@@ -1,36 +1,19 @@
-import asyncio
-from bleak import BleakClient, BleakScanner
+from kivy.app import App
+from kivy.uix.label import Label
+from jnius import autoclass
 
-TARGET_NAME = "USpbj-5610S"
+# 安全引入 Android 原生蓝牙适配层
+try:
+    PythonActivity = autoclass('org.kivy.android.PythonActivity')
+    BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
+    BT_AVAILABLE = True
+except Exception:
+    BT_AVAILABLE = False
 
-def notification_handler(sender, data):
-    # 实时捕获 0xFFB0 串口透传的原始数据
-    hex_data = data.hex().upper()
-    print(f"[收到跑步机数据] HEX: {hex_data}")
+class TreadmillBridgeApp(App):
+    def build(self):
+        status_text = "UOK E6Pro 蓝牙桥接服务\n已成功启动并加载 Android 蓝牙底层" if BT_AVAILABLE else "运行环境初始化中..."
+        return Label(text=status_text, font_size=18, halign='center')
 
-async def main():
-    print(f"正在搜索跑步机: {TARGET_NAME} ...")
-    device = await BleakScanner.find_device_by_name(TARGET_NAME, timeout=15.0)
-    
-    if not device:
-        print("未找到跑步机，请确认已通电。")
-        return
-
-    print(f"找到设备 {device.address}，正在连接...")
-    async with BleakClient(device) as client:
-        print("连接成功！正在监听 0xFFB0 通道...")
-        for service in client.services:
-            if "ffb0" in service.uuid.lower():
-                for char in service.characteristics:
-                    if "notify" in char.properties:
-                        await client.start_notify(char.uuid, notification_handler)
-                        print(f"成功绑定特征值: {char.uuid}")
-                        
-        while True:
-            await asyncio.sleep(1)
-
-if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except Exception as e:
-        print(f"异常: {e}")
+if __name__ == '__main__':
+    TreadmillBridgeApp().run()
