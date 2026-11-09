@@ -7,7 +7,6 @@ source.include_exts = py,png,jpg,kv,atlas
 source.dir = .
 version = 0.1
 
-# 移除无法编译的 bleak，保留核心 kivy 和底层蓝牙桥接库 pyjnius
 requirements = python3,kivy,pyjnius
 
 orientation = portrait
@@ -16,6 +15,10 @@ android.permissions = BLUETOOTH,BLUETOOTH_ADMIN,BLUETOOTH_CONNECT,BLUETOOTH_SCAN
 
 android.api = 33
 android.minapi = 21
+
+# 关键：允许云端自动接受 Android SDK 协议，防止编译被强制中止
+android.accept_sdk_license = True
+
 fullscreen = 0
 
 [buildozer]
