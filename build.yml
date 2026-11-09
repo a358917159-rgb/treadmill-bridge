@@ -1,0 +1,23 @@
+name: Build Android APK
+
+on: [push]
+
+jobs:
+  build:
+  # 使用官方 Linux 环境自动运行 Buildozer 打包
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build with Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
+        with:
+          command: buildozer android debug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: bin/*.apk
